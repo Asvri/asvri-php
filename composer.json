@@ -1,0 +1,17 @@
+{
+    "name": "asvri/asvri-php",
+    "description": "ASVRI's API for PHP: checkout sessions paid with any gateway you connected to ASVRI, refunds, and signed webhooks.",
+    "type": "library",
+    "keywords": ["asvri", "payments", "checkout", "paystack", "flutterwave", "mobile money", "webhooks"],
+    "homepage": "https://asvri.com",
+    "license": "MIT",
+    "authors": [{ "name": "ASVRI", "homepage": "https://asvri.com" }],
+    "require": {
+        "php": ">=8.0",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": { "Asvri\\": "src/" }
+    }
+}
