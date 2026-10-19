@@ -39,8 +39,8 @@ $asvri = new \Asvri\Client(getenv('ASVRI_SECRET_KEY'));
 
 ```php
 $session = $asvri->checkoutSessions->create([
-    'amount' => 2500.00,                 // major units; or 'line_items' => [['name' => …, 'quantity' => 1, 'amount' => …]]
-    'currency' => 'NGN',
+    'amount' => 25.00,                 // major units; or 'line_items' => [['name' => …, 'quantity' => 1, 'amount' => …]]
+    'currency' => 'USD',
     'description' => 'Order #1042',
     'reference' => '1042',
     'customer' => ['name' => 'Ada Obi', 'email' => 'ada@example.com'],

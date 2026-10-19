@@ -10,7 +10,7 @@ use Asvri\Service\WebhookEndpoints;
  * ASVRI's API from your server (PHP 8.0+). Use your secret key (sk_test_… or sk_live_…), never in a browser.
  *
  *   $asvri = new \Asvri\Client('sk_test_…');
- *   $session = $asvri->checkoutSessions->create(['amount' => 2500, 'currency' => 'NGN', 'success_url' => '…']);
+ *   $session = $asvri->checkoutSessions->create(['amount' => 25, 'currency' => 'USD', 'success_url' => '…']);
  *   header('Location: ' . $session['url']);
  *
  * Options: api_base (default https://api.asvri.com/app/api/v1), timeout (seconds, default 30), max_retries (default 2:

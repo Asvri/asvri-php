@@ -6,8 +6,8 @@ $asvri = new \Asvri\Client(getenv('ASVRI_SECRET_KEY'));
 
 $orderId = 1042; // your own order
 $session = $asvri->checkoutSessions->create([
-    'amount' => 2500.00,
-    'currency' => 'NGN',
+    'amount' => 25.00,
+    'currency' => 'USD',
     'description' => "Order #$orderId",
     'reference' => (string)$orderId,
     'customer' => ['name' => 'Ada Obi', 'email' => 'ada@example.com'],
