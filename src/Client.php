@@ -2,8 +2,11 @@
 
 namespace Asvri;
 
+use Asvri\Service\Charges;
 use Asvri\Service\CheckoutSessions;
+use Asvri\Service\PaymentMethods;
 use Asvri\Service\Refunds;
+use Asvri\Service\SetupSessions;
 use Asvri\Service\WebhookEndpoints;
 
 /**
@@ -13,13 +16,16 @@ use Asvri\Service\WebhookEndpoints;
  *   $session = $asvri->checkoutSessions->create(['amount' => 25, 'currency' => 'USD', 'success_url' => '…']);
  *   header('Location: ' . $session['url']);
  *
+ * Cards on file: $asvri->setupSessions (save a card with nothing paid), $asvri->paymentMethods (what was saved) and
+ * $asvri->charges (charge it later, with nobody present).
+ *
  * Options: api_base (default https://api.asvri.com/app/api/v1), timeout (seconds, default 30), max_retries (default 2:
- * only reads, session creation and webhook registration are retried, never a refund or an expire), api_ext (a suffix for every path; only for a local
+ * only reads, idempotent creates and webhook registration are retried, never a refund, an expire, a cancel or a charge without an idempotency key), api_ext (a suffix for every path; only for a local
  * copy of ASVRI, e.g. '.php').
  */
 class Client
 {
-    const VERSION = '1.0.0';
+    const VERSION = '1.1.0';
     const DEFAULT_API_BASE = 'https://api.asvri.com/app/api/v1';
 
     /** @var CheckoutSessions */
@@ -28,6 +34,12 @@ class Client
     public $refunds;
     /** @var WebhookEndpoints */
     public $webhookEndpoints;
+    /** @var SetupSessions */
+    public $setupSessions;
+    /** @var PaymentMethods */
+    public $paymentMethods;
+    /** @var Charges */
+    public $charges;
 
     /** @var HttpClient */
     private $http;
@@ -49,6 +61,9 @@ class Client
         $this->checkoutSessions = new CheckoutSessions($this->http);
         $this->refunds = new Refunds($this->http);
         $this->webhookEndpoints = new WebhookEndpoints($this->http);
+        $this->setupSessions = new SetupSessions($this->http);
+        $this->paymentMethods = new PaymentMethods($this->http);
+        $this->charges = new Charges($this->http);
     }
 
     /** 'test' or 'live', from the key. */

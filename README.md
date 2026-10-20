@@ -1,6 +1,6 @@
 # ASVRI PHP SDK
 
-ASVRI's API for PHP. Take payments with every gateway you've connected to ASVRI (cards, bank transfer, USSD, mobile money): create a checkout session on your server, send the customer to it, and confirm the payment with ASVRI or its signed webhook. Refund through the gateway that took the payment.
+ASVRI's API for PHP. Take payments with every gateway you've connected to ASVRI (cards, bank transfer, USSD, mobile money): create a checkout session on your server, send the customer to it, and confirm the payment with ASVRI or its signed webhook. Refund through the gateway that took the payment. Keep cards on file and charge them later.
 
 PHP 8.0 or newer (tested on 8.0 to 8.5), with the curl and json extensions. No other dependencies.
 
@@ -90,6 +90,47 @@ if ($event['type'] === 'checkout.session.completed') {
 
 Events: `checkout.session.completed` and `checkout.session.expired`. Events older than 5 minutes are refused as possible replays (`constructEvent($payload, $header, $secret, $toleranceSeconds)`).
 
+## Cards on file
+
+Save a customer's card now, with nothing paid, and charge it later with nobody present (subscriptions, usage billing, "pay with my saved card"). Only gateways that can keep a card without a payment take part (Stripe, PayPal and others marked "Save & charge later" in your dashboard).
+
+**1. On your server, create a setup session:**
+
+```php
+$setup = $asvri->setupSessions->create([
+    'customer' => ['email' => 'ada@example.com', 'name' => 'Ada Obi'],
+    'success_url' => 'https://yourshop.com/account/cards?saved=1',   // ASVRI adds ?setup_session_id=ss_…
+    'metadata' => ['account' => '42'],
+], 'cards-42-1');                                                    // optional idempotency key
+```
+
+**2. Let the customer add the card:** send them to the session's `url`, or hand its `client_secret` to the browser and embed the form in your own page with asvri.js. The gateway's own secure fields collect the card, so neither you nor ASVRI sees the number.
+
+**3. Confirm it was saved** with `retrieve()` or the `payment_method.attached` webhook, never from the redirect alone:
+
+```php
+$setup = $asvri->setupSessions->retrieve($_GET['setup_session_id']);
+if ($setup['status'] === 'completed') {
+    $card = $setup['payment_method'];   // ['id' => 'pm_…', 'label' => 'Visa •••• 4242', …]: store $card['id']
+}
+```
+
+**4. Charge it later**, always with an idempotency key so a retry can never charge twice:
+
+```php
+$charge = $asvri->charges->create([
+    'payment_method' => 'pm_…', 'amount' => 49.99, 'currency' => 'USD',
+    'description' => 'October subscription', 'reference' => 'sub-1042-oct',
+], 'sub-1042-oct');
+// $charge['status']: succeeded ($charge['payment'] is the transaction), failed ($charge['error'] says why),
+// pending (charge.succeeded / charge.failed follows by webhook) or requires_action (the bank wants the
+// customer: send them to $charge['next_action']['url'])
+```
+
+Other calls: `$asvri->paymentMethods->all(['customer' => 'ada@example.com'])`, `->retrieve('pm_…')`, `->detach('pm_…')` (it can't be charged again); `$asvri->charges->retrieve('ch_…')`, `->all(['payment_method' => 'pm_…'])`; `$asvri->setupSessions->all(['status' => 'completed'])`, `->cancel('ss_…')`; refund a charge with `$asvri->refunds->create(['payment' => $charge['payment']['id']])`.
+
+Events: `payment_method.attached`, `payment_method.detached`, `charge.succeeded`, `charge.failed`, `charge.requires_action` (the object is in `data.payment_method` / `data.charge`).
+
 ## Refunds
 
 ```php
@@ -114,6 +155,6 @@ Everything the SDK throws extends `\Asvri\Exception\AsvriException`:
 
 API errors also carry `getHttpStatus()`, `getErrorType()` and `getJsonBody()`.
 
-Reads, session creation and webhook registration are retried automatically (twice, on a dropped connection, a 429 or a 5xx). Session creation always sends an idempotency key, so a retry can't create a second session. Refunds and expire() are never retried: on `ApiConnectionException`, check the session with `retrieve()` before trying again. Options: `new \Asvri\Client($key, ['timeout' => 30, 'max_retries' => 2])`.
+Reads, session creation, webhook registration and charges **with** an idempotency key are retried automatically (twice, on a dropped connection, a 429 or a 5xx). Session creation always sends an idempotency key, so a retry can't create a second session. Refunds, expire(), cancel() and a charge without an idempotency key are never retried: on `ApiConnectionException`, check the session with `retrieve()` (or the method's charges with `$asvri->charges->all()`) before trying again. Options: `new \Asvri\Client($key, ['timeout' => 30, 'max_retries' => 2])`.
 
 See `examples/` for a checkout page, a thank-you page and a webhook endpoint.
