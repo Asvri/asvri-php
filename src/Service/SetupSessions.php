@@ -6,8 +6,10 @@ use Asvri\HttpClient;
 
 /**
  * Cards on file, step one: a customer saves a card (or wallet) now, with nothing paid, to be charged later through
- * $asvri->charges. Open the session's 'url', or embed it in your page with asvri.js and its 'client_secret'. Once
- * 'completed', the session's 'payment_method' is the saved card (pm_…).
+ * $asvri->charges. Open the session's 'url', or embed it in your page with asvri.js and its 'setup_token' (a
+ * single-use token for that one add-card page, safe in a browser; never put your sk_ API key in a page). Once
+ * 'completed', the session's 'payment_method' is the saved card (pm_…). 'client_secret' is a deprecated alias of
+ * 'setup_token' with the same value. Guide: https://www.asvri.com/developers/cards-on-file
  */
 class SetupSessions
 {
@@ -28,7 +30,7 @@ class SetupSessions
      *   (e.g. 'stripe'), every able gateway when left out; expires_in in seconds, 300..604800 (default 24 hours)
      * @param string|null $idempotencyKey the same key returns the same session (a retry, a double click) instead of a
      *   second one; made for you when left out, so this call is safely retried
-     * @return array<string, mixed> the session: id, url, client_secret, status, customer, payment_method, …
+     * @return array<string, mixed> the session: id, url, setup_token, status, customer, payment_method, …
      */
     public function create(array $params, $idempotencyKey = null)
     {

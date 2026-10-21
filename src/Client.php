@@ -25,7 +25,7 @@ use Asvri\Service\WebhookEndpoints;
  */
 class Client
 {
-    const VERSION = '1.1.0';
+    const VERSION = '1.1.1';
     const DEFAULT_API_BASE = 'https://api.asvri.com/app/api/v1';
 
     /** @var CheckoutSessions */
