@@ -10,7 +10,7 @@ $session = $asvri->checkoutSessions->create([
     'currency' => 'USD',
     'description' => "Order #$orderId",
     'reference' => (string)$orderId,
-    'customer' => ['name' => 'Ada Obi', 'email' => 'ada@example.com'],
+    'customer' => ['name' => 'John Doe', 'email' => 'john@example.com'],
     'success_url' => 'https://yourshop.com/thanks', // ASVRI adds ?session_id=cs_…
     'cancel_url' => 'https://yourshop.com/cart',
     'metadata' => ['order_id' => (string)$orderId],

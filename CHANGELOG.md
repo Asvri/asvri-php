@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3 - 2026-10-22
+
+- Examples use the sample customer John Doe (john@example.com). No code changes.
+
 ## 1.1.2 - 2026-10-22
 
 - Setup text now points to Settings → API access, where your API keys are.
