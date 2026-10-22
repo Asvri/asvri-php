@@ -29,7 +29,7 @@ require_once '/path/to/asvri-php/init.php';
 
 ## Keys
 
-Use your **secret key** (`sk_test_…` or `sk_live_…`) from ASVRI → Payments → Configuration → Checkout & API, on your server only. Test keys use only test gateways, so no real money moves.
+Use your **secret key** (`sk_test_…` or `sk_live_…`) from ASVRI → Settings → API access, on your server only. Test keys use only test gateways, so no real money moves.
 
 ```php
 $asvri = new \Asvri\Client(getenv('ASVRI_SECRET_KEY'));

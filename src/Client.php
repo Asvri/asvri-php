@@ -25,7 +25,7 @@ use Asvri\Service\WebhookEndpoints;
  */
 class Client
 {
-    const VERSION = '1.1.1';
+    const VERSION = '1.1.2';
     const DEFAULT_API_BASE = 'https://api.asvri.com/app/api/v1';
 
     /** @var CheckoutSessions */
@@ -45,7 +45,7 @@ class Client
     private $http;
 
     /**
-     * @param string $secretKey sk_test_… or sk_live_… from ASVRI → Payments → Configuration → Checkout & API
+     * @param string $secretKey sk_test_… or sk_live_… from ASVRI → Settings → API access
      * @param array{api_base?: string, timeout?: int, max_retries?: int, api_ext?: string} $options
      */
     public function __construct($secretKey, array $options = [])
@@ -55,7 +55,7 @@ class Client
             throw new \InvalidArgumentException('That is a publishable key. The ASVRI API needs your secret key (sk_test_… or sk_live_…), on your server only.');
         }
         if (!preg_match('/^sk_(test|live)_[A-Za-z0-9]{16,}$/', $secretKey)) {
-            throw new \InvalidArgumentException('Pass your ASVRI secret key: sk_test_… or sk_live_… (ASVRI → Payments → Configuration → Checkout & API).');
+            throw new \InvalidArgumentException('Pass your ASVRI secret key: sk_test_… or sk_live_… (ASVRI → Settings → API access).');
         }
         $this->http = new HttpClient($secretKey, $options);
         $this->checkoutSessions = new CheckoutSessions($this->http);
