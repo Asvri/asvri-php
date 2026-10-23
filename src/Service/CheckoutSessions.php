@@ -23,9 +23,13 @@ class CheckoutSessions
      * Create a session and send the customer to its 'url'.
      *
      * @param array{amount?: float, line_items?: array<array{name: string, quantity?: int, amount: float}>, currency: string,
-     *   description?: string, reference?: string, customer?: array{name?: string, email?: string}, success_url?: string,
-     *   cancel_url?: string, metadata?: array<string, string>, payment_methods?: string[], expires_in?: int} $params
-     *   amount (major units, e.g. 2500.00) or line_items; ASVRI adds ?session_id=cs_… to success_url and cancel_url
+     *   description?: string, reference?: string, customer?: array{name?: string, email?: string, address?: array{country: string,
+     *   state?: string, city?: string, postal_code?: string}, tax_id?: string}, success_url?: string, cancel_url?: string,
+     *   metadata?: array<string, string>, payment_methods?: string[], expires_in?: int, tax?: 'auto',
+     *   tax_behavior?: 'exclusive'|'inclusive'} $params
+     *   amount (major units, e.g. 2500.00) or line_items; ASVRI adds ?session_id=cs_… to success_url and cancel_url.
+     *   tax 'auto': ASVRI works out the tax with the business's tax rules; the session's amount is then what the
+     *   customer pays, tax included, and 'tax' in the answer has the breakdown
      * @param string|null $idempotencyKey the same key returns the same session (a retry, a double click) instead of a
      *   second one; made for you when left out, so this call is safely retried
      * @return array<string, mixed> the session: id, url, status, amount, currency, …
